@@ -54,7 +54,7 @@
     {% endif %}
     <div class="box-shadow profile-info" id="userInfo">
         <div class="cover-photo">
-            <img src="{{ request.user.user_avatar.url }}" alt="">
+            <img src="{{ user.user_avatar.url }}" alt="">
         </div>
         <div class="personal-info">
             <h3 class="mg-bottom">{{ user.username }}</h3>
@@ -89,7 +89,7 @@
 
 <div class="mobile-user-activity mg-top font-segoe">
     {% for article in articles %}
-    <a href="{% url 'article' article.id %}" class="box-shadow w-200 pd-5 mg-left mg-bottom">
+    <a href="{% url 'article' article.title %}" class="box-shadow w-200 pd-5 mg-left mg-bottom">
         <div class="d-flex">
             <div class="article-avatar-box">
                 <img src="{{ article.avatar.url }}" alt="">
