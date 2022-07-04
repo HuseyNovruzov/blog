@@ -1,0 +1,24 @@
+
+<div class="feed-container">
+
+{% for article in articles %}
+  <div class="card-container">
+    <div class="image-container">
+      <img src="{{ article.avatar.url }}" alt="">
+    </div>
+    <div class="describ-container">
+      <div class="elements">
+        <span class="card-span"></span>
+        <span class="article-title font-segoe">{{ article.title }}</span>
+        <span class="article-describ font-segoe font-sm">{{ article.short_description | slice:"0:120" }}...</span>
+        <a href="{% url 'article' article.title %}" class="read-more-button">Read More</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No post yet</p>
+{% endfor %}
+{% if articles.count > 5 %}
+<a href="#" class="load_more">Load More</a>
+{% endif %}
+</div>

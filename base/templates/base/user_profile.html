@@ -1,0 +1,106 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+{% if request.user == user %}
+<div class="settings-list user-menu mg-top">
+    <ul class="font-segoe">
+        <li>
+            <a href="{% url 'settings' %}" class="d-flex">
+                <span>Settings</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'update_password' %}" class="d-flex">
+                <span>Update password</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="d-flex">
+                <span>Statistics</span>
+            </a>
+        </li>
+    </ul>
+</div>
+{% endif %}
+<div class="user-page font-segoe mg-top">
+    {% if request.user == user %}
+    <div class="box-shadow account-sidebar">
+        <h3>Menu</h3>
+        <nav class="main-menu">
+            
+            <ul class="sidebar-list">
+            <li>                                   
+                <a href="{% url 'settings' %}">
+                    <i class="fa fa-gear fa-lg"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </li>     
+            <li>                                   
+                <a href="{% url 'update_password' %}">
+                    <i class="fa fa-user fa-lg"></i>
+                    <span class="nav-text">Update password</span>
+                </a>
+            </li>
+            <li>                                   
+                <a href="{% url 'home' %}">
+                    <i class="fa fa-calendar fa-lg"></i>
+                    <span class="nav-text">Statistics</span>
+                </a>
+            </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+    <div class="box-shadow profile-info" id="userInfo">
+        <div class="cover-photo">
+            <img src="{{ request.user.user_avatar.url }}" alt="">
+        </div>
+        <div class="personal-info">
+            <h3 class="mg-bottom">{{ user.username }}</h3>
+            <p class="mg-bottom">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem, aliquam laboriosam minima maxime voluptate suscipit ab molestias quasi consequuntur facere nesciunt quia autem quibusdam doloremque facilis.</p>
+        </div>
+        {% if request.user == user %}
+        <div class="edit-profile">
+            <a href="{% url 'settings' %}" class="rounded-btn">Edit profile</a>
+        </div>
+        {% endif %}
+        <div class="info">
+
+        </div>
+    </div>
+
+    <div class="user-activity box-shadow">
+        
+        <h3>Activity</h3>
+        
+            <ul>
+                {% for article in articles %}
+                <li>
+                    <a href="{% url 'article' article.id %}">{{ article.title }}</a>
+                </li>
+                {% empty %}
+                <p>No post yet</p>
+                {% endfor %}
+            </ul>
+        
+    </div>
+</div>
+
+<div class="mobile-user-activity mg-top font-segoe">
+    {% for article in articles %}
+    <a href="{% url 'article' article.id %}" class="box-shadow w-200 pd-5 mg-left mg-bottom">
+        <div class="d-flex">
+            <div class="article-avatar-box">
+                <img src="{{ article.avatar.url }}" alt="">
+            </div>
+        </div>
+        <p>{{ article.title|slice:':20' }}...</p>
+        <span class="fs-12 timesince">published at {{ article.created|date:'d-m-y' }}</span>
+    </a>
+    {% empty %}
+    <p class="nopost">No post yet</p>
+    {% endfor %}
+</div>
+
+{% endblock content %}

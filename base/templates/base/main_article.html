@@ -1,0 +1,313 @@
+{% extends 'main.html' %}
+{% load mptt_tags %}
+
+{% include 'navigation.html' %}
+{% block content %}
+
+<div class="blog-header">
+    <header class="header">
+        <div class="category">{{ article.topic }}</div>
+        <h1>
+          {{article.title}}
+        </h1>
+        <div class="article-author">
+          <div class="author-avatar">
+            <img src="{{ article.host.user_avatar.url }}" alt="">
+          </div>
+          <div class="author-description">
+            <a href="{% url 'profile' article.host.id %}" class="author-profile-link">
+              <h2>{{ article.host.username}}</h2>
+            </a>
+            <span class="pub-date">{{ article.created| date:'d M Y'}}</span>
+          </div>
+          
+        </div>
+    </header>
+    <div class="article-avatar">
+      <img src="{{ article.avatar.url }}" alt="">
+    </div>
+</div>
+
+<div class="blog-page">
+  <div></div>
+
+    <div class="article-content">
+      <div class="article">
+        {{ article.description | safe }}
+      </div>
+      <div class='article_footer_wrapper'>
+        <a href="{{request.META.HTTP_REFERER}}" class="back_button">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <title>arrow-left</title>
+            <path
+              d="M13.723 2.286l-13.723 13.714 13.719 13.714 1.616-1.611-10.96-10.96h27.625v-2.286h-27.625l10.965-10.965-1.616-1.607z">
+            </path>
+          </svg>
+        </a>
+
+        <!--    LIKE section    -->
+        <div id="like-section">
+          {% if request.user.is_authenticated %}
+          {% if liked %}
+          <button type="submit" name="{{ article.id }}" class="like-btn" id="likeButton">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ea0000" class="heart-svg" viewBox="0 0 18 18">
+              <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+            </svg>
+          </button>
+          {% else %}
+            <button type="submit" name="{{ article.id }}" class="like-btn" id="likeButton">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="heart-svg" viewBox="0 0 18 18">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+              </svg>
+            </button>
+          {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}" class="like-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="heart-svg" viewBox="0 0 18 18">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+        {% if likes %}
+        <span class="likes-count" id="totalLikes"> {{ likes }} nefer bunu beyendi</span>
+        {% else %}
+        <span class="likes-count" id="totalLikes"></span>
+        {% endif %}
+      </div>
+
+
+      <!--    COMMENT SECTION    -->
+      <div class="comments" id="commentsContainer">
+        <h2 id="comment_count">
+          {% with total=comments.count %}
+           {{ total }} comment{{total|pluralize }}
+          {% endwith %}
+        </h2>
+        
+        <form action="{% url 'article' article.title %}" method="POST" class="add-comment" id="parentcomment">
+          {% csrf_token %}
+          {% for field in form %}
+          {{ field }}
+          {% endfor %}
+          <input type="submit" value="Send" id="maincomment" class="comment-btn" name="parentcomment">
+        </form>
+        {% if comments.count %}
+        {% recursetree comments %}
+        <div class="user-comment" id="comment{{ node.id }}">
+          <div class="user-avatar">
+            <img src="{{ node.user.user_avatar.url }}" alt="">
+          </div>
+          <div class="comment-details">
+            <span class="comment-author">
+              <a href="{% url 'profile' node.user.id %}" class="text-link">{{ node.user.username }}</a>
+            </span>
+            
+            <span class="comment-pub-date">{{ node.created|timesince}} ago</span>
+            <div>
+              <span class="comment-body">
+              {{ node.body }}
+            </span><br/>
+            <div class="d-flex">
+              <button onclick="addReply({{ node.id }})" class="link-btn" id="replyBtn">Reply</button>
+              {% if node.user == request.user %}
+              <form action="{% url 'article' article.id %}" method="POST" id="deleteComment">
+                {% csrf_token %}
+                <input type="hidden" name="deletedcomment" value="{{ node.id }}">
+                <input type="submit" name="deleteComment" id="deletecommentbtn" value="Delete" class="link-btn">
+              </form>
+              {% endif %}
+            </div>
+            
+              
+            
+            </div>
+            
+          </div>
+        </div>
+
+          
+        {% if not node.is_leaf_node %}
+          <div class="children ml-child">
+            {{ children }}
+          </div>
+        {% endif %}
+        {% endrecursetree %}
+        {% else %}
+        <p class="empty-comment-box">No comments yet</p>
+        {% endif %}
+      </div>
+    </div>
+    
+  <div>
+    
+  </div>
+</div>
+<script>
+  
+  function addReply(id){
+    const replyform = document.getElementById('newcomment');
+    const is_contain = document.contains(replyform);
+    if(is_contain){
+      replyform.remove();
+    }
+    const elem = document.getElementById(`comment${id}`);
+    elem.insertAdjacentHTML('afterend', `
+    <form action="{% url 'article' article.id %}" method="POST" class="add-comment" id='newcomment'>
+          {% csrf_token %}
+          <textarea id='id_body' name='body' ></textarea>
+          <select id='id_parent' class='d-none' name='parent'>
+            <option value='${id}' selected='${id}'></option>
+          </select>
+          <input type="submit" value="Send" id="replycomment" class="comment-btn" name="newcomment">
+          <input type='button' value='Cancel' class='link-btn' onclick='cancelComment()'>
+        </form>`);
+  }
+
+  function cancelComment(){
+    document.getElementById(`newcomment`).classList.add('d-none');
+  }
+
+/*   Like   */
+  $(document).on('click','#likeButton', function(e){
+  e.preventDefault();
+  const post_id = $(this).attr('name');
+  const url = '{% url "like" %}';
+  
+  $.ajax({
+    type: 'POST',
+    url: url,
+    data: {
+      post_id: post_id,
+      csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+    },
+    success: function(response){
+      
+      if(response.liked){
+        $('#totalLikes').html(`${response.total_likes} nefer bunu beyendi`);
+        document.querySelector('.heart-svg').remove();
+        document.getElementById('likeButton').insertAdjacentHTML('beforeend',`
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ea0000" class="heart-svg" viewBox="0 0 18 18">
+              <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+            </svg>
+          `)
+      }
+      else{
+        document.querySelector('.heart-svg').remove();
+        document.getElementById('likeButton').insertAdjacentHTML('beforeend',`
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="heart-svg" viewBox="0 0 18 18">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+              </svg>`)
+        if(!response.total_likes){
+          $('#totalLikes').html('');
+        }
+        else{
+          $('#totalLikes').html(`${response.total_likes} nefer bunu beyendi`);
+        }
+      }
+    },
+    error: function(xhr,err, errmsg){
+      console.log(xhr);
+    }
+  })
+})
+
+
+/*=========== COMMENT =============  */
+$(document).on('click', '#maincomment, #replycomment', function(e){
+    e.preventDefault();
+    const url = $(this).attr('action');
+    const form = $(this).attr('name');
+    const parent = $(this).parent();
+    
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: $('#'+ form).serialize(),
+    
+        success: function(response){
+          if(response.user){
+            parent.after(`<div class="user-comment" id="comment${response.comment_id}">
+            <div class="user-avatar">
+              <img src="${response.image}" alt="">
+            </div>
+            <div class="comment-details">
+              <span class="comment-author">
+                ${response.user}
+              </span>
+              <span class="comment-pub-date">Just now</span>
+              <div>
+                <span class="comment-body">
+                ${response.result}
+              </span><br/>
+              <div class="d-flex">
+                <button onclick="addReply(${response.comment_id})" class="link-btn" id="replyBtn">Reply</button>
+                
+                <form action="{% url 'article' article.id %}" method="POST" id="deleteComment">
+                  {% csrf_token %}
+                  <input type="hidden" name="deletedcomment" value="${ response.comment_id }">
+                  <input type="submit" name="deleteComment" id="deletecommentbtn" value="Delete" class="link-btn">
+                </form>
+                
+              </div>
+              </div>
+              
+             </div>
+           </div>`)
+          }
+          /* Handling no comments section */
+          empty_comment_box = $('.empty-comment-box');
+          if(empty_comment_box){
+            empty_comment_box.remove();
+          }
+          /* Handling comment counter */
+          comment_count = document.getElementById('comment_count');
+          text = comment_count.innerHTML.trim();
+          count = parseInt(text.split(' ')[0]) + 1;
+          comment_count.innerHTML = `${count} ${text.split(' ')[1]}`;
+          /* Removing additional  reply form */
+           $('#id_body').val('');
+           if(form != 'parentcomment'){
+             parent.remove();
+           }
+           
+        },
+        error: function(xhr, errmsg, err){
+            console.log(xhr)
+            console.log(errmsg)
+        }
+    });
+})
+
+
+/*  Delete comment  */
+
+$(document).on('click', '#deletecommentbtn', function(e){
+  e.preventDefault();
+  const url = "{% url 'delete' %}";
+  const form = $(this).parent();
+
+  $.ajax({
+    type: 'POST',
+    url: url,
+    data: form.serialize(),
+
+    success: function(response){
+      if(response.deleted){
+        $('#comment'+response.id).remove();
+      }
+      /* Handling comment counter */
+      comment_count = document.getElementById('comment_count');
+      text = comment_count.innerHTML.trim();
+      count = parseInt(text.split(' ')[0]);
+      comment_count.innerHTML = `${count - 1} ${text.split(' ')[1]}`;
+      
+    },
+    error: function(xhr, errmsg, err){
+      console.log(errmsg);
+    }
+  })
+})
+
+</script>
+{% endblock %}

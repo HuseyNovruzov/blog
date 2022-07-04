@@ -1,0 +1,76 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main id="log" class="log-content">
+    {% if page == 'login' %}
+    <div class="log">
+            <div class="login">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="title">Login</div>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" placeholder="example@mail.com">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" placeholder="****************">
+                    {% if messages %}
+                    {% for message in messages %}
+                        <div class="error box">
+                            {{message}}
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                    <span><a href="{% url 'forgot_password' %}" class="link-btn">Forgot password</a></span>
+                    <button class="btn" type="submit">Sign In</button>
+                </form>
+                <span>Don't have an account? <a class="link-btn" href="{% url 'register' %}">Sign Up</a></span>
+            </div>
+    </div>
+    {% else %}
+    <div class="log">
+            <div class="register">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="title">Register</div>
+                    {% for field in form %}
+                    <label for="">{{ field.label_tag }}</label>
+                    {{field}}
+                    <div class="help_text">{{field.help_text}}</div>
+                    {% endfor %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="error box">
+                        {{message}}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    <button class="btn" type="submit">Sign Up</button>
+                </form>
+                <span>Do you already have an account ?<a class="link-btn" href="{% url 'login' %}">Sign In</a></span>
+            </div>
+    </div>
+    {% endif %}
+</main>
+
+
+
+
+<!-- {% if page == 'login' %}
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="email" name="email" id="email" placeholder="Enter email">
+    <input type="password" name="password" id="password" placeholder="Enter password">
+    <input type="submit" value="Login">
+</form>
+<a href="{% url 'forgot_password' %}">Forgot password</a>
+<span>Don't have an account? <a href="{% url 'register' %}">Register</a></span>
+{% else %}
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" name="" id="" value="Register">
+</form>
+<span>Already have an account?<a href="{% url 'login' %}">Login</a></span>
+{% endif %} -->
+{% endblock %}
+
