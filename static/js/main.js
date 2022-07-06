@@ -6,8 +6,10 @@ document.querySelector('.toggle').addEventListener('click', function() {
 
 
 document.getElementById('toolbar_btn').addEventListener('click', ()=>{
-    document.getElementById('toolbar').classList.toggle('show_toolbar');
+document.getElementById('toolbar').classList.toggle('show_toolbar');
 })
+
+
 
 function show_span(){
     spans = document.querySelectorAll('.nav-item');

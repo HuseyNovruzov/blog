@@ -11,7 +11,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class UserUpdateForm(ModelForm):
-
     class Meta:
         model = CustomUser
         fields = ['username', 'user_avatar']

@@ -77,7 +77,7 @@
             <ul>
                 {% for article in articles %}
                 <li>
-                    <a href="{% url 'article' article.id %}">{{ article.title }}</a>
+                    <a href="{% url 'article' article.title %}">{{ article.title }}</a>
                 </li>
                 {% empty %}
                 <p>No post yet</p>

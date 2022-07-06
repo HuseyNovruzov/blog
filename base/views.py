@@ -12,7 +12,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views import View
 import os
 
@@ -122,7 +122,7 @@ class Registerpage(View):
             if pass1 != pass2:
                 messages.error(request, 'Password does not match')
             else:
-                messages.error(request,'You entered invalid field')
+                messages.error(request,'Password does not meet credentials')
             
         context = {'page': self.page, 'form': self.form}
         return render(request, 'base/login_register.html', context)
@@ -182,23 +182,26 @@ class Articlepage(View):
 
 
     def post(self, request, title, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('login')
         article = Articles.objects.get(title=title)
         
         comment_form = CommentForm(request.POST)
-        
         if comment_form.is_valid():
-
+            body = comment_form.cleaned_data.get('body')
+            success = False
+            if body:
+                success = True
             comment = comment_form.save(commit=False)
             comment.user = request.user
             comment.article = article
             comment.save()
             result = comment_form.cleaned_data.get('body')
             user = request.user.username
-            return JsonResponse({'result': result, 'user': user, 'comment_id': comment.id, 'image': comment.user.user_avatar.url})
+            return JsonResponse({'result': result, 'user': user, 
+            'comment_id': comment.id, 
+            'image': comment.user.user_avatar.url, 
+            'success': success})
         
-        return redirect('article', pk=article.id)
+        return redirect('article', title=article.title)
         
 
 def like(request):

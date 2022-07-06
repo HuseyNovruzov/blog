@@ -76,22 +76,26 @@
         {% endif %}
       </div>
 
-
       <!--    COMMENT SECTION    -->
+      <h2 id="comment_count" class="mg-bottom">
+        {% with total=comments.count %}
+         {{ total }} comment{{total|pluralize }}
+        {% endwith %}
+      </h2>
+      {% if not request.user.is_authenticated %}
+      <p>Want to comment? <a href="{% url 'login' %}" class="regular-link">login</a></p>
+      {% endif %}
       <div class="comments" id="commentsContainer">
-        <h2 id="comment_count">
-          {% with total=comments.count %}
-           {{ total }} comment{{total|pluralize }}
-          {% endwith %}
-        </h2>
-        
+        {% if request.user.is_authenticated %}
         <form action="{% url 'article' article.title %}" method="POST" class="add-comment" id="parentcomment">
           {% csrf_token %}
           {% for field in form %}
           {{ field }}
           {% endfor %}
+          <input type="hidden" name="is_logged" value="{{ request.is_authenticated }}">
           <input type="submit" value="Send" id="maincomment" class="comment-btn" name="parentcomment">
         </form>
+        {% endif %}
         {% if comments.count %}
         {% recursetree comments %}
         <div class="user-comment" id="comment{{ node.id }}">
@@ -108,16 +112,18 @@
               <span class="comment-body">
               {{ node.body }}
             </span><br/>
+            {% if request.user.is_authenticated %}
             <div class="d-flex">
-              <button onclick="addReply({{ node.id }})" class="link-btn" id="replyBtn">Reply</button>
+              <button onclick="addReply( {{node.id}} )" class="link-btn" id="replyBtn">Reply</button>
               {% if node.user == request.user %}
-              <form action="{% url 'article' article.id %}" method="POST" id="deleteComment">
+              <form action="{% url 'article' article.title %}" method="POST" id="deleteComment">
                 {% csrf_token %}
                 <input type="hidden" name="deletedcomment" value="{{ node.id }}">
                 <input type="submit" name="deleteComment" id="deletecommentbtn" value="Delete" class="link-btn">
               </form>
               {% endif %}
             </div>
+            {% endif %}
             
               
             
@@ -155,7 +161,7 @@
     elem.insertAdjacentHTML('afterend', `
     <form action="{% url 'article' article.id %}" method="POST" class="add-comment" id='newcomment'>
           {% csrf_token %}
-          <textarea id='id_body' name='body' ></textarea>
+          <textarea id='id_body' name='body'></textarea>
           <select id='id_parent' class='d-none' name='parent'>
             <option value='${id}' selected='${id}'></option>
           </select>
@@ -256,6 +262,7 @@ $(document).on('click', '#maincomment, #replycomment', function(e){
            </div>`)
           }
           /* Handling no comments section */
+          if(response.success){
           empty_comment_box = $('.empty-comment-box');
           if(empty_comment_box){
             empty_comment_box.remove();
@@ -265,16 +272,18 @@ $(document).on('click', '#maincomment, #replycomment', function(e){
           text = comment_count.innerHTML.trim();
           count = parseInt(text.split(' ')[0]) + 1;
           comment_count.innerHTML = `${count} ${text.split(' ')[1]}`;
+        
           /* Removing additional  reply form */
            $('#id_body').val('');
            if(form != 'parentcomment'){
              parent.remove();
            }
+          }
            
         },
         error: function(xhr, errmsg, err){
-            console.log(xhr)
-            console.log(errmsg)
+
+          console.log(errmsg)
         }
     });
 })
