@@ -10,28 +10,27 @@
 
     <div class="login">
         {% if request.user.is_authenticated %}
-        
+
         <button class="toolbarBtn" id="toolbar_btn">
-            <img src="/static/images/avatar.jpg" alt="">
+            <img src="/static/images/static_images/avatar.jpg" alt="">
         </button>
         
         {% else %}
         <a href="{% url 'login' %}"><button>Login</button></a>
         <a href="{% url 'register' %}"><button>Register</button></a>
         {% endif %}
-
-
-        
     </div>
 
 
 </nav>
 <div class="toolbar box-shadow" id="toolbar">
+    <a href="{% url 'profile' request.user.id %}">Profile</a>
     <a href="{% url 'logout' %}">Logout</a>
     <a href="{% url 'settings' %}">Settings</a>
 </div>
 
 <!-- Mobile version -->
+<div class="d-flex-sp-btw">
 <div class="header-menu box-shadow">
     <div class="header-container">
         <div class="toggle"></div>
@@ -48,3 +47,11 @@
     {% endif %}
 </div>
 
+{% if request.user.is_authenticated %}
+<div class="my-profile">
+    <a href="{% url 'profile' request.user.id %}">
+        <img src="{{ request.user.user_avatar.url }}" alt="">
+    </a>
+</div>
+{% endif %}
+</div>
