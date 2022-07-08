@@ -233,10 +233,11 @@ def userSettings(request):
     context = {'form': form, 'title': title}
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=user)
-        old_image = request.user.user_avatar
+        # old_image = request.user.user_avatar
+        print(request.FILES.get('user_avatar'))
         if form.is_valid():
-            if request.FILES.get('user_avatar') is not None and os.path.exists(old_image.path):
-                os.remove(old_image.path)
+            # if request.FILES.get('user_avatar') is not None and os.path.exists(old_image.path):
+            #     os.remove(old_image.path)
             form.save()
             return redirect('home')
     return render(request, 'base/account_setting.html', context)

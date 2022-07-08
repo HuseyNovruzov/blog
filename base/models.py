@@ -42,7 +42,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=200)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    user_avatar = models.ImageField(default='avatar.jpg')
+    user_avatar = models.ImageField(upload_to='images/profile_pictures', default='images/profile_pictures/avatar.jpg',)
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -55,7 +55,7 @@ class Articles(models.Model):
     title = models.CharField(max_length=200, unique=True)
     description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    avatar = models.ImageField(null=True, upload_to='article_images')
+    avatar = models.ImageField(null=True, upload_to='images/article_images')
     short_description = models.CharField(max_length=250,null=True)
     likes = models.ManyToManyField(CustomUser, related_name='likes', blank=True)
 

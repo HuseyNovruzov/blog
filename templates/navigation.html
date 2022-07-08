@@ -1,4 +1,4 @@
-
+{% load static %}
 <nav class="nav">
     <div class="logo">
         <a href="{% url 'home' %}">
@@ -12,7 +12,7 @@
         {% if request.user.is_authenticated %}
 
         <button class="toolbarBtn" id="toolbar_btn">
-            <img src="/static/images/static_images/avatar.jpg" alt="">
+            <img src="{% static 'images/static_images/avatar.jpg' %}" alt="">
         </button>
         
         {% else %}
