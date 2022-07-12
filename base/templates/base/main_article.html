@@ -77,13 +77,13 @@
       </div>
 
       <!--    COMMENT SECTION    -->
-      <h2 id="comment_count" class="mg-bottom">
+      <h2 id="comment_count" class="mg-bottom pd-5">
         {% with total=comments.count %}
          {{ total }} comment{{total|pluralize }}
         {% endwith %}
       </h2>
       {% if not request.user.is_authenticated %}
-      <p>Want to comment? <a href="{% url 'login' %}" class="regular-link">login</a></p>
+      <p class="pd-5">Want to comment? <a href="{% url 'login' %}" class="regular-link">login</a></p>
       {% endif %}
       <div class="comments" id="commentsContainer">
         {% if request.user.is_authenticated %}
@@ -233,7 +233,7 @@ $(document).on('click', '#maincomment, #replycomment', function(e){
     
         success: function(response){
           if(response.user){
-            parent.after(`<div class="user-comment" id="comment${response.comment_id}">
+            parent.after(`<div class="user-comment mg-left" id="comment${response.comment_id}">
             <div class="user-avatar">
               <img src="${response.image}" alt="">
             </div>
