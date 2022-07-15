@@ -109,7 +109,7 @@ class Registerpage(View):
             user = self.form.save(commit=False)
             user.is_active = False
             user.save()
-            verify_mail = self.form.cleaned_data.get('email')
+            verify_mail = email = self.form.cleaned_data.get('email')
             bool = sendEmail(request, user, self.template_name, mail_address=verify_mail, subject = subject)
             if bool:
                 return render(request, 'base/sent_email.html')
@@ -117,12 +117,21 @@ class Registerpage(View):
             pass1 = request.POST.get('password1')
             pass2 = request.POST.get('password2')
             name = request.POST.get('username')
+            email = request.POST.get('email')
+            is_mail_exists = True
+            try:
+                CustomUser.objects.get(email=email)
+            except:
+                is_mail_exists = False
             if len(name) == 0:
                 messages.error('You must enter username')
-            if pass1 != pass2:
+            elif pass1 != pass2:
                 messages.error(request, 'Password does not match')
+            elif is_mail_exists:
+                messages.error(request, 'This email address has been used')
             else:
                 messages.error(request,'Password does not meet credentials')
+            
             
         context = {'page': self.page, 'form': self.form}
         return render(request, 'base/login_register.html', context)
