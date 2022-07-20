@@ -1,8 +1,9 @@
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
-from .models import CustomUser, Messages
+from .models import CustomUser, Messages, Articles
 from django import forms
 from mptt.forms import TreeNodeChoiceField
+from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -13,7 +14,7 @@ class CustomUserCreationForm(UserCreationForm):
 class UserUpdateForm(ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'user_avatar']
+        fields = ['username', 'user_avatar', 'bio']
 
 class CommentForm(forms.ModelForm):
     parent = TreeNodeChoiceField(queryset=Messages.objects.all())
@@ -32,4 +33,11 @@ class CommentForm(forms.ModelForm):
         fields = ('body','parent',)
         
 
+class ArticleForm(ModelForm):
+    class Meta:
+        model = Articles
+        exclude = ('likes',)
+        widgets = {
+            'description': SummernoteWidget(),
+        }
         

@@ -1,24 +1,37 @@
-
-<div class="feed-container">
-
-{% for article in articles %}
-  <div class="card-container">
-    <div class="image-container">
-      <img src="{{ article.avatar.url }}" alt="">
-    </div>
-    <div class="describ-container">
-      <div class="elements">
-        <span class="card-span"></span>
-        <span class="article-title font-segoe">{{ article.title }}</span>
-        <span class="article-describ font-segoe font-sm">{{ article.short_description | slice:"0:120" }}...</span>
-        <a href="{% url 'article' article.title %}" class="read-more-button">Read More</a>
+<div class="create__btn__box">
+  {% if request.user.is_authenticated %}
+      <div class="create-article">
+        <a href="{% url 'create-article' %}" class="mg-bottom create-btn bg-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16" viewBox="0 0 24 24"
+                style=" fill:#ffffff;">
+            <path fill-rule="evenodd" 
+            d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z">
+            </path>
+            </svg>
+            Create</a>
+      </div>
+    {% endif %}
+  <div class="feed-container">
+    
+  {% for article in articles %}
+    <div class="card-container">
+      <div class="image-container">
+        <img src="{{ article.avatar.url }}" alt="">
+      </div>
+      <div class="describ-container">
+        <div class="elements">
+          <span class="card-span"></span>
+          <span class="article-title font-segoe">{{ article.title }}</span>
+          <span class="article-describ font-segoe font-sm">{{ article.short_description | slice:"0:120" }}...</span>
+          <a href="{% url 'article' article.title %}" class="read-more-button">Read More</a>
+        </div>
       </div>
     </div>
+    {% empty %}
+    <p>No post yet</p>
+  {% endfor %}
+  {% if articles.count > 5 %}
+  <a href="#" class="load_more">Load More</a>
+  {% endif %}
   </div>
-  {% empty %}
-  <p>No post yet</p>
-{% endfor %}
-{% if articles.count > 5 %}
-<a href="#" class="load_more">Load More</a>
-{% endif %}
 </div>

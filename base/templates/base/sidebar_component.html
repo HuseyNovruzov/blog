@@ -5,14 +5,12 @@
         
         <li>                                   
             <a href="{% url 'home' %}">
-                <i class="fa fa-angle-right fa-lg"></i>
                 <span class="nav-text">All</span>
             </a>
         </li>     
         {% for topic in topics %}   
         <li>                                   
             <a href="{% url 'home' %}?q={{topic.name}}">
-                <i class="{{ topic.classname }}"></i>
                 <span class="nav-text">{{ topic.name }}</span>
             </a>
         </li>     

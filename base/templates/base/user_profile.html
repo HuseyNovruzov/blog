@@ -52,23 +52,26 @@
         </nav>
     </div>
     {% endif %}
-    <div class="box-shadow profile-info" id="userInfo">
-        <div class="cover-photo">
-            <img src="{{ user.user_avatar.url }}" alt="">
-        </div>
-        <div class="personal-info">
-            <h3 class="mg-bottom">{{ user.username }}</h3>
-            <p class="mg-bottom">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem, aliquam laboriosam minima maxime voluptate suscipit ab molestias quasi consequuntur facere nesciunt quia autem quibusdam doloremque facilis.</p>
-        </div>
-        {% if request.user == user %}
-        <div class="edit-profile">
-            <a href="{% url 'settings' %}" class="rounded-btn">Edit profile</a>
-        </div>
-        {% endif %}
-        <div class="info">
+    <div class="create-article mg-left mg-right">
+        <div class="box-shadow profile-info" id="userInfo">
+            <div class="cover-photo">
+                <img src="{{ user.user_avatar.url }}" alt="">
+            </div>
+            <div class="personal-info">
+                <h3 class="mg-bottom">{{ user.username }}</h3>
+                <p class="mg-bottom">{{ user.bio }}</p>
+            </div>
+            {% if request.user == user %}
+            <div class="edit-profile">
+                <a href="{% url 'settings' %}" class="rounded-btn">Edit profile</a>
+            </div>
+            {% endif %}
+            <div class="info">
 
+            </div>
         </div>
     </div>
+    
 
     <div class="user-activity box-shadow">
         

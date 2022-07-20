@@ -7,8 +7,10 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 class Topic(models.Model):
     name = models.CharField(max_length=200)
-    classname = models.CharField(max_length=200)
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        return super(Topic, self).save(*args, **kwargs)
     def __str__(self):
         return self.name
 
@@ -43,10 +45,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     user_avatar = models.ImageField(upload_to='images/profile_pictures', default='images/profile_pictures/avatar.jpg',)
+    bio = models.TextField(null=True, max_length=300)
     objects = CustomUserManager()
-
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username',]
 
 class Articles(models.Model):
 
@@ -55,6 +57,7 @@ class Articles(models.Model):
     title = models.CharField(max_length=200, unique=True)
     description = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     avatar = models.ImageField(null=True, upload_to='images/article_images')
     short_description = models.CharField(max_length=250,null=True)
     likes = models.ManyToManyField(CustomUser, related_name='likes', blank=True)
@@ -64,11 +67,6 @@ class Articles(models.Model):
 
     def __str__(self):
         return self.title
-
-
-    def shortdescription(self):
-        
-        return self.description[:150].replace('  ', ' ')
 
 class Messages(MPTTModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

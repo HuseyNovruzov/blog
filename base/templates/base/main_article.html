@@ -10,18 +10,35 @@
         <h1>
           {{article.title}}
         </h1>
-        <div class="article-author">
-          <div class="author-avatar">
-            <img src="{{ article.host.user_avatar.url }}" alt="">
-          </div>
-          <div class="author-description">
-            <a href="{% url 'profile' article.host.id %}" class="author-profile-link">
-              <h2>{{ article.host.username}}</h2>
-            </a>
-            <span class="pub-date">{{ article.created| date:'d M Y'}}</span>
-          </div>
-          
+        <div class="d-flex-sp-btw">
+          <div class="article-author">
+            <div class="author-avatar">
+              <img src="{{ article.host.user_avatar.url }}" alt="">
+            </div>
+            <div class="author-description">
+              <a href="{% url 'profile' article.host.id %}" class="author-profile-link">
+                <h2>{{ article.host.username}}</h2>
+              </a>
+              {% if updated %}
+              <span class="pub-date">Updated {{ article.created| date:'d M Y'}}</span>
+              {% else %}
+              <span class="pub-date">{{ article.created| date:'d M Y'}}</span>
+              {% endif %}
+            </div>
         </div>
+        {% if request.user == article.host %}
+          <div class="d-flex update-delete-box">
+            <a href="{% url 'update-article' article.title %}" class="mg-right regular-link">Update</a>
+            <a href="{% url 'delete-article' article.title %}" class="regular-link">Delete</a>
+          </div>
+          <div class="mobile-version-update-delete">
+            <a href="{% url 'update-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-pen fa-sm"></i></a>
+            <a href="{% url 'delete-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-trash fa-sm"></i></a>
+          </div>
+        {% endif %}
+        </div>
+        
+        
     </header>
     <div class="article-avatar">
       <img src="{{ article.avatar.url }}" alt="">

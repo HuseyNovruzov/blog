@@ -1,7 +1,5 @@
 from django.test import TestCase, Client
-
 from base.models import CustomUser, Articles, Topic, Messages
-import json
 
 class UserTestCase(TestCase):
 
@@ -50,7 +48,7 @@ class UserTestCase(TestCase):
         data = {'email': self.user_email }
         response = self.client.post(url, data, follow=True)
         # go to reset password page
-        reset_password_url = f'/reset_password/{response.context["uid"]}/{response.context["token"]}'
+        reset_password_url = f'/reset-password/{response.context["uid"]}/{response.context["token"]}'
         reset_password_data = {'new_password1': 'NissanGTR22', 'new_password2': 'NissanGTR22'}
         reset_password_response = self.client.post(reset_password_url, reset_password_data, follow=True)
         status_code = reset_password_response.status_code
@@ -100,36 +98,62 @@ class UserTestCase(TestCase):
         self.assertEqual(status_code, 200)
     
     def test_user_profile(self):
-        profile_url = f'/user_profile/{self.user_a.id}/'
+        profile_url = f'/user-profile/{self.user_a.id}/'
         response = self.client.get(profile_url)
         status_code = response.status_code
         self.assertEqual(status_code,200)
         
     def test_user_settings(self):
-
         self.login_user()
         settings_url = '/settings/'
         data = {'username': 'ccc'}
-        response = self.client.post(settings_url, data, follow=True)
-        redirected_path = response.request['PATH_INFO']
+        response = self.client.post(settings_url, data)
         status_code = response.status_code
         self.assertEqual(status_code,200)
-        self.assertEqual(redirected_path,'/')
 
     def test_update_password(self):
-
         self.login_user()
         update_passsword_url = '/update-password/'
         data = {'password1': 'Felicita2014', 'password2': 'Felicita2014'}
 
         response = self.client.post(update_passsword_url, data, follow=True)
-        redirected_path = response.request['PATH_INFO']
+        redirected_url = response.request['PATH_INFO']
         status_code = response.status_code
-        self.assertEqual(redirected_path, '/login/')
+        self.assertEqual(redirected_url, '/login/')
         self.assertEqual(status_code, 200)
     
+    def create_article(self):
+        self.login_user()
+        create_post_url = '/create-article/'
+        with open('D:/Wallpaper//pexels-pixabay-163585.jpg', 'rb') as img:
+            data = {'topic': 'Test', 'title': 'Test 1', 'description': 'test', 'avatar': img ,'short_description': 'test'}
+            response = self.client.post(create_post_url, data, follow=True)
+            return response
 
+    def test_create_article(self):
+        response = self.create_article()
+        status_code = response.status_code
+        self.assertEqual(status_code,200)
+    
+    def test_update_article(self):
+        self.create_article()
+        update_post_url = '/article/update-article/Test 1/'
+        with open('D:/Wallpaper//pexels-pixabay-315999.jpg', 'rb') as img:
+            update_data = {'title': 'Test 2', 'description': 'test 2', 'avatar': img,'short_description': 'test 2'}
+            response = self.client.post(update_post_url, update_data, follow=True)
+        update_status_code = response.status_code
+        redirected_url = response.request['PATH_INFO']
+        self.assertEqual(update_status_code, 200)
+        self.assertEqual(redirected_url, '/article/update-article/Test 2/')
 
+    def test_delete_article(self):
+        self.create_article()
+        delete_article_url = '/article/delete-article/Test 1/'
+        response = self.client.post(delete_article_url, follow=True)
+        status_code = response.status_code
+        redirected_url = response.request['PATH_INFO']
+        self.assertEqual(status_code, 200)
+        self.assertEqual(redirected_url, '/')
         
 
 

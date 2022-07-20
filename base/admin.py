@@ -7,21 +7,21 @@ from mptt.admin import MPTTModelAdmin
 # Register your models here.
 
 class PostAdmin(SummernoteModelAdmin):
-    summernote_fields = '__all__'
+    summernote_fields = ('description')
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     model = CustomUser
-    list_display = ('email','username', 'is_staff', 'is_active')
-    # list_filter = ('email', 'is_staff', 'is_active')
+    list_display = ('email','username', 'is_staff', 'is_active', 'bio')
+    
     fieldsets = (
-        (None, {'fields': ('email','username', 'password')}),
+        (None, {'fields': ('email','username', 'password', 'bio')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','username' ,'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('email','username' ,'password1', 'password2', 'is_staff', 'is_active', 'bio')}
         ),
     )
     search_fields = ('email',)

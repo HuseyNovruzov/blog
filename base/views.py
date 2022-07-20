@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Topic, Articles, Messages
-from .forms import CommentForm, CustomUserCreationForm, UserUpdateForm
+from .forms import CommentForm, CustomUserCreationForm, UserUpdateForm, ArticleForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -12,9 +12,8 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound, JsonResponse
 from django.views import View
-import os
 
 def home(request):
     page = 'home'
@@ -124,7 +123,7 @@ class Registerpage(View):
             except:
                 is_mail_exists = False
             if len(name) == 0:
-                messages.error('You must enter username')
+                messages.error(request,'You must enter username')
             elif pass1 != pass2:
                 messages.error(request, 'Password does not match')
             elif is_mail_exists:
@@ -182,11 +181,14 @@ class Articlepage(View):
         article = Articles.objects.get(title=title)
         comments = article.messages_set.all()
         likes_count = article.likes.count()
+        updated = False
         liked = False
         if article.likes.filter(id=request.user.id).exists():
             liked = True
+        if article.updated > article.created:
+            updated = True
         comment_form = CommentForm()
-        context = {'article': article, 'comments': comments,  'likes': likes_count, 'liked': liked, 'form': comment_form}
+        context = {'article': article, 'comments': comments,  'likes': likes_count, 'liked': liked, 'form': comment_form, 'updated': updated}
         return render(request, 'base/main_article.html', context)
 
 
@@ -243,12 +245,12 @@ def userSettings(request):
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=user)
         # old_image = request.user.user_avatar
-        print(request.FILES.get('user_avatar'))
         if form.is_valid():
             # if request.FILES.get('user_avatar') is not None and os.path.exists(old_image.path):
             #     os.remove(old_image.path)
             form.save()
-            return redirect('home')
+            messages.success(request,'You have successfully updated profile info!')
+            return redirect('settings')
     return render(request, 'base/account_setting.html', context)
 
 @login_required(login_url='login')
@@ -274,3 +276,74 @@ def deleteComment(request):
         deleted = True
     context = {'deleted': deleted, 'id': pk}
     return JsonResponse(context)
+
+@login_required(login_url='login')
+def createArticle(request):
+    topics = Topic.objects.all()
+    form = ArticleForm()
+    context = {'form': form, 'topics': topics }
+    if request.method == 'POST':
+        topic_name = request.POST.get('topic').lower()
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        title = request.POST.get('title')
+        is_exists = True
+        try:
+            Articles.objects.get(title=title)
+        except:
+            is_exists = False
+        if is_exists:
+            messages.error(request, 'This title already exists, please use another')
+            return render(request, 'base/create_article.html', context)
+        Articles.objects.create(
+            host = request.user,
+            topic = topic,
+            title = title,
+            description=request.POST.get('description'),
+            avatar = request.FILES.get('avatar'),
+            short_description = request.POST.get('short_description'),
+        )
+        return redirect('home')
+
+    return render(request, 'base/create_article.html', context)
+
+@login_required(login_url='login')
+def updateArticle(request, title):
+    article = Articles.objects.get(title=title)
+    if request.user != article.host:
+        raise Http404
+    form = ArticleForm(instance=article)
+    
+    if request.method == 'POST':
+        article.title = request.POST.get('title')
+        article.description = request.POST.get('description')
+        article.short_description = request.POST.get('short_description')
+        
+        if request.FILES.get('avatar') is not None:
+            article.avatar = request.FILES.get('avatar')
+        article.save()
+        messages.success(request, 'You successfully updated post!')
+        return redirect('update-article', article.title)
+            
+    context = {'form': form, 'article': article }
+    return render(request, 'base/update_article.html', context)
+
+@login_required(login_url='login')
+def deletePost(request, title):
+    article = Articles.objects.get(title=title)
+    existing_topics = Articles.objects.values('topic')
+    topic = Topic.objects.get(name=article.topic)
+    count = 0
+    for item in existing_topics:
+        if article.topic.id in item.values():
+            count += 1
+    
+    if request.user != article.host:
+        raise Http404
+    context = {'article': article}
+    if request.method == 'POST':
+        if request.user == article.host:
+            article.delete()
+            if count <=1 :
+                topic.delete()
+            return redirect('home')
+    return render(request, 'base/verify_delete.html', context)

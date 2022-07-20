@@ -23,20 +23,22 @@
         </ul>
     </div>
     <div class="center">
-        <div class="update-container font-segoe box-shadow">
+        {% for message in messages %}
+        <div class="success-box mg-top">
+            {{ message }}
+        </div>
+        {% endfor %}
+        <div class="update-container font-segoe box-shadow mg-top mg-bottom">
             <div class="profile-picture-box">
                 <img src="{{ request.user.user_avatar.url }}" alt="">     
             </div>
-    
             <form action="" method="POST" class="user-update-form" enctype="multipart/form-data">
                 {% csrf_token %}
-    
                 {% for field in form %}
                 <div class="update-field-wrap">
                     <label class="update-label">{{ field.label }}</label>
                     {{ field }}
                     {{ field.help_text }}
-
                 </div>
                 {% endfor %}
                 
