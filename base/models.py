@@ -1,7 +1,5 @@
-import math
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.utils import timezone
 from mptt.models import MPTTModel, TreeForeignKey
 # Create your models here.
 
