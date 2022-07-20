@@ -57,7 +57,7 @@ class Articles(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     avatar = models.ImageField(null=True, upload_to='images/article_images')
-    short_description = models.CharField(max_length=250,null=True)
+    short_description = models.TextField(max_length=250,null=True)
     likes = models.ManyToManyField(CustomUser, related_name='likes', blank=True)
 
     class Meta:

@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.http import Http404, HttpResponse, HttpResponseNotFound, JsonResponse
 from django.views import View
+import os 
 
 def home(request):
     page = 'home'
@@ -342,6 +343,7 @@ def deletePost(request, title):
     context = {'article': article}
     if request.method == 'POST':
         if request.user == article.host:
+            os.remove(article.avatar.path)
             article.delete()
             if count <=1 :
                 topic.delete()
