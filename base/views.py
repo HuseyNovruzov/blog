@@ -343,7 +343,7 @@ def deletePost(request, title):
     context = {'article': article}
     if request.method == 'POST':
         if request.user == article.host:
-            os.remove(article.avatar.path)
+            # os.remove(article.avatar.path)
             article.delete()
             if count <=1 :
                 topic.delete()
