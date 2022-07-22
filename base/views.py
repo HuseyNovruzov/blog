@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Topic, Articles, Messages
 from .forms import CommentForm, CustomUserCreationForm, UserUpdateForm, ArticleForm
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
@@ -12,7 +13,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.http import Http404, HttpResponse, HttpResponseNotFound, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views import View
 import os 
 
@@ -157,11 +158,15 @@ def resetPassword(request, uidb64, token):
         user = CustomUser.objects.get(pk=uid)
     except(TypeError, ValueError):
         user = None
-
+    context = {'form': form}
     if user is not None and default_token_generator.check_token(user, token):
         if request.method == 'POST':
             form = SetPasswordForm(user,request.POST)
+            password = request.POST.get('new_password1')
             if form.is_valid():
+                if check_password(password,user.password):
+                    messages.error(request, 'Can not be same with current password')
+                    return render(request, 'base/reset_password.html', context)
                 form.save()
                 return render(request, 'base/password_reset_done.html', {'reseted': True})
             else:
@@ -169,7 +174,8 @@ def resetPassword(request, uidb64, token):
                 pass2 = request.POST.get('new_password2')
                 if pass1 != pass2:
                     messages.error(request,"Password doesn't match")
-        context = {'form': form}
+                else:
+                    messages.error(request,'Password does not meet credentials')
         return render(request, 'base/reset_password.html', context)
     else:
         return HttpResponse('Invalid link')
@@ -258,13 +264,27 @@ def userSettings(request):
 def updatePassword(request):
     title = 'Update Password'
     form = PasswordChangeForm(request.user)
+    context = {'form': form, 'title': title}
     if request.method == 'POST':
-        form = PasswordChangeForm(request.POST)
+        form = PasswordChangeForm(request.user,request.POST)
+        old_password = request.POST.get('old_password')
+        password1 = request.POST.get('new_password1')
+        password2 = request.POST.get('new_password2')
         if form.is_valid():
+            if check_password(password1, request.user.password):
+                messages.error(request, 'Can not be same with current password')
+                return render(request, 'base/update_password.html', context)
             form.save()
             logout(request)
-        return redirect('login')
-    context = {'form': form, 'title': title}
+            return redirect('login')
+        else:
+            if not check_password(old_password, request.user.password):
+                messages.error(request,'Please type current password correctly')
+            elif password1 != password2:
+                messages.error(request, 'Password does not match')
+            else:
+                messages.error(request, 'Password does not meet credentials')
+
     return render(request, 'base/update_password.html', context)
 
 @login_required(login_url='login')

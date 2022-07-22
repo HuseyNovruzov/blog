@@ -24,9 +24,11 @@
     </div>
     <div class="center">
         {% for message in messages %}
+        {% if message.tags == 'success' %}
         <div class="success-box mg-top">
             {{ message }}
         </div>
+        {% endif %}
         {% endfor %}
         <div class="update-container font-segoe box-shadow mg-top mg-bottom">
             <div class="profile-picture-box">
@@ -41,7 +43,13 @@
                     {{ field.help_text }}
                 </div>
                 {% endfor %}
-                
+                {% for message in messages %}
+                {% if message.tags == 'error' %}
+                <div class="error-message mg-bottom fs-12">
+                    {{ message }}
+                </div>
+                {% endif %}
+                {% endfor %}
     
                 <div class="update-field-footer">
                     <a href="{% url 'home' %}">Cancel</a>
