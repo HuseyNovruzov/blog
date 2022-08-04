@@ -1,4 +1,5 @@
 {% load static %}
+{% comment %}
 <nav class="nav">
     <div class="logo">
         <a href="{% url 'home' %}">
@@ -20,38 +21,34 @@
         <a href="{% url 'register' %}"><button>Register</button></a>
         {% endif %}
     </div>
-
-
 </nav>
-<div class="toolbar box-shadow" id="toolbar">
-    <a href="{% url 'profile' request.user.id %}">Profile</a>
-    <a href="{% url 'logout' %}">Logout</a>
-    <a href="{% url 'settings' %}">Settings</a>
-</div>
+{% endcomment %}
 
-<!-- Mobile version -->
-<div class="d-flex-sp-btw">
-<div class="header-menu box-shadow">
-    <div class="header-container">
-        <div class="toggle"></div>
-    </div>
-    {% if page == 'home' %}
-    <span class="hidden nav-item"><button id="topicBtn">Topics </button></span>
-    {% endif %}
-    {% if request.user.is_authenticated %}
-    <span class="hidden nav-item"><a href="{% url 'logout' %}">Logout</a></span>
-    <span class="hidden nav-item"><a href="{% url 'settings' %}">Settings</a></span>
-    {% else %}
-    <span class="hidden nav-item"><a href="{% url 'login' %}">LogIn</a></span>
-    <span class="hidden nav-item"><a href="{% url 'register' %}">Register</a></span>
-    {% endif %}
-</div>
 
-{% if request.user.is_authenticated %}
-<div class="my-profile">
-    <a href="{% url 'profile' request.user.id %}">
-        <img src="{{ request.user.user_avatar.url }}" alt="">
-    </a>
-</div>
-{% endif %}
-</div>
+<div class="page-wrapper">
+    <div class="nav-wrapper">
+     <nav class="navbar">
+       <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/Bluestar_%28bus_company%29_logo.svg/1280px-Bluestar_%28bus_company%29_logo.svg.png" alt="Company Logo">
+       <div class="menu-toggle" id="mobile-menu">
+         <span class="bar"></span>
+         <span class="bar"></span>
+         <span class="bar"></span>
+       </div>
+       <ul class="nav no-search">
+         <li class="nav-item"><a href="{% url 'home' %}">Home</a></li>
+         {% if request.user.is_authenticated %}
+         <li class="nav-item"> <a href="{% url 'profile' request.user.id %}">Profile</a></li>
+         <li class="nav-item"> <a href="{% url 'settings' %}">Settings</a></li>
+         <li class="nav-item"> <a href="{% url 'logout' %}">Logout</a></li>
+         {% else %}
+         <li class="nav-item"> <a href="{% url 'login' %}">Login</a></li>
+         <li class="nav-item"><a href="{% url 'register' %}">Register</a></li>
+         {% endif %}
+         <li class="nav-item"><a href="{% url 'create-article' %}">Create post</a></li>
+       </ul>
+     </nav>
+     <div class="grad-bar"></div>
+     </div>
+    
+   </div>
+  

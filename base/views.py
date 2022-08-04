@@ -22,6 +22,7 @@ def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
     topics = Topic.objects.all()
     articles = Articles.objects.filter(Q(topic__name__icontains=q) | Q(title__icontains=q))
+        
     context = {'topics': topics, 'articles': articles, 'page': page}
     return render(request, 'base/home.html', context)
     

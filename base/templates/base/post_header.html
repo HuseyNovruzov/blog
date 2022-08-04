@@ -1,0 +1,19 @@
+<header class="header">
+    <div class="category">{{ article.topic }}</div>
+    <h1>
+      {{article.title}}
+    </h1>
+    <div class="d-flex-sp-btw">
+      {% include 'base/author.html' %}
+    {% if request.user == article.host %}
+      <div class="d-flex update-delete-box">
+        <a href="{% url 'update-article' article.title %}" class="mg-right regular-link">Update</a>
+        <a href="{% url 'delete-article' article.title %}" class="regular-link">Delete</a>
+      </div>
+      <div class="mobile-version-update-delete">
+        <a href="{% url 'update-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-pen fa-sm"></i></a>
+        <a href="{% url 'delete-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-trash fa-sm"></i></a>
+      </div>
+    {% endif %}
+    </div>
+</header>

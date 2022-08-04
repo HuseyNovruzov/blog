@@ -25,7 +25,24 @@
             
         </a>
     </div>
-
+    <div class="mobile-topics mg-top">
+        <h3 class="font-segoe mg-left">Topics</h3>
+        <ul class="mg-top">
+            <li>                                   
+                <a href="{% url 'home' %}">
+                    <span class="nav-text">All</span>
+                </a>
+            </li>     
+            {% for topic in topics %}   
+            <li>                                   
+                <a href="{% url 'home' %}?q={{topic.name}}">
+                    <span class="nav-text">{{ topic.name }}</span>
+                </a>
+            </li>     
+            {% endfor %}
+        </ul>
+    </div>
+        
 <div class="home-container">
 
     <!-- Sidebar component -->

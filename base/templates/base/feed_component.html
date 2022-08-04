@@ -1,5 +1,5 @@
-<div class="create__btn__box">
-  {% if request.user.is_authenticated %}
+
+    {% if request.user.is_authenticated %}
       <div class="create-article">
         <a href="{% url 'create-article' %}" class="mg-bottom create-btn bg-blue">
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16" viewBox="0 0 24 24"
@@ -8,24 +8,33 @@
             d="M 11 2 L 11 11 L 2 11 L 2 13 L 11 13 L 11 22 L 13 22 L 13 13 L 22 13 L 22 11 L 13 11 L 13 2 Z">
             </path>
             </svg>
-            Create</a>
+         </a>
       </div>
     {% endif %}
-  <div class="feed-container">
-    
+
+  <div class="feed-container mg-left mg-right">
+    <h3 class="font-segoe mg-bottom">Feed</h3>
   {% for article in articles %}
     <div class="card-container">
-      <div class="image-container">
-        <img src="{{ article.avatar.url }}" alt="">
-      </div>
+      {% include 'base/author.html'%}
       <div class="describ-container">
         <div class="elements">
-          <span class="card-span"></span>
-          <span class="article-title font-segoe">{{ article.title }}</span>
-          <span class="article-describ font-segoe font-sm">{{ article.short_description | slice:"0:120" }}...</span>
-          <a href="{% url 'article' article.title %}" class="read-more-button">Read More</a>
+          <span class="article-title font-segoe mg-top mg-bottom">{{ article.title }}</span>
+          <span class="article-describ font-segoe font-sm">{{ article.short_description }}
+            <a href="{% url 'article' article.title %}" class="read-more-button">read more</a>
+          </span>
         </div>
-      </div>
+      </div> 
+      <div class="card-footer mg-top">
+        <div>
+          {% if article.likes.count >= 1 %}
+          {{ article.likes.count }} people like this
+        {% endif %}
+        </div>
+        <div>
+           {{ article.messages_set.all.count }} comments
+        </div>
+      </div>         
     </div>
     {% empty %}
     <p>No post yet</p>
@@ -34,4 +43,4 @@
   <a href="#" class="load_more">Load More</a>
   {% endif %}
   </div>
-</div>
+

@@ -1,45 +1,11 @@
 {% extends 'main.html' %}
 {% load mptt_tags %}
-
+{% load static %}
 {% include 'navigation.html' %}
 {% block content %}
 
 <div class="blog-header">
-    <header class="header">
-        <div class="category">{{ article.topic }}</div>
-        <h1>
-          {{article.title}}
-        </h1>
-        <div class="d-flex-sp-btw">
-          <div class="article-author">
-            <div class="author-avatar">
-              <img src="{{ article.host.user_avatar.url }}" alt="">
-            </div>
-            <div class="author-description">
-              <a href="{% url 'profile' article.host.id %}" class="author-profile-link">
-                <h2>{{ article.host.username}}</h2>
-              </a>
-              {% if updated %}
-              <span class="pub-date">Updated {{ article.created| date:'d M Y'}}</span>
-              {% else %}
-              <span class="pub-date">{{ article.created| date:'d M Y'}}</span>
-              {% endif %}
-            </div>
-        </div>
-        {% if request.user == article.host %}
-          <div class="d-flex update-delete-box">
-            <a href="{% url 'update-article' article.title %}" class="mg-right regular-link">Update</a>
-            <a href="{% url 'delete-article' article.title %}" class="regular-link">Delete</a>
-          </div>
-          <div class="mobile-version-update-delete">
-            <a href="{% url 'update-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-pen fa-sm"></i></a>
-            <a href="{% url 'delete-article' article.title %}" class="regular-link"><i class="fa fa-solid fa-trash fa-sm"></i></a>
-          </div>
-        {% endif %}
-        </div>
-        
-        
-    </header>
+    {% include 'base/post_header.html' %}
     <div class="article-avatar">
       <img src="{{ article.avatar.url }}" alt="">
     </div>
@@ -63,34 +29,7 @@
         </a>
 
         <!--    LIKE section    -->
-        <div id="like-section">
-          {% if request.user.is_authenticated %}
-          {% if liked %}
-          <button type="submit" name="{{ article.id }}" class="like-btn" id="likeButton">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ea0000" class="heart-svg" viewBox="0 0 18 18">
-              <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-            </svg>
-          </button>
-          {% else %}
-            <button type="submit" name="{{ article.id }}" class="like-btn" id="likeButton">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="heart-svg" viewBox="0 0 18 18">
-                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-              </svg>
-            </button>
-          {% endif %}
-          {% else %}
-            <a href="{% url 'login' %}" class="like-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="heart-svg" viewBox="0 0 18 18">
-                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-              </svg>
-            </a>
-          {% endif %}
-        </div>
-        {% if likes %}
-        <span class="likes-count" id="totalLikes"> {{ likes }} nefer bunu beyendi</span>
-        {% else %}
-        <span class="likes-count" id="totalLikes"></span>
-        {% endif %}
+        {% include 'base/like.html' %}
       </div>
 
       <!--    COMMENT SECTION    -->
@@ -141,11 +80,7 @@
               {% endif %}
             </div>
             {% endif %}
-            
-              
-            
             </div>
-            
           </div>
         </div>
 
@@ -192,7 +127,7 @@
   }
 
 /*   Like   */
-  $(document).on('click','#likeButton', function(e){
+$(document).on('click','#likeButton', function(e){
   e.preventDefault();
   const post_id = $(this).attr('name');
   const url = '{% url "like" %}';
@@ -234,7 +169,6 @@
     }
   })
 })
-
 
 /*=========== COMMENT =============  */
 $(document).on('click', '#maincomment, #replycomment', function(e){

@@ -1,0 +1,15 @@
+<div class="article-author">
+    <div class="author-avatar">
+      <img src="{{ article.host.user_avatar.url }}" alt="">
+    </div>
+    <div class="author-description">
+      <a href="{% url 'profile' article.host.id %}" class="author-profile-link">
+        <h2>{{ article.host.username}}</h2>
+      </a>
+      {% if updated %}
+      <span class="pub-date">Updated {{ article.created| date:'d M Y'}}</span>
+      {% else %}
+      <span class="pub-date">{{ article.created| date:'d M Y'}}</span>
+      {% endif %}
+    </div>
+</div>
