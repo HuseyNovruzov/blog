@@ -8,8 +8,8 @@
     <form action="" method="POST">
         {% csrf_token %}
         <div class="d-flex mg-top">
-            <a href="{{ request.META.HTTP_REFERER }}" class="create-btn bg-secondary">No, go back</a>
-            <button type="submit" class="create-btn bg-red mg-left">Yes, I'm</button>
+            <a href="{{ request.META.HTTP_REFERER }}" class="regular-btn bg-secondary">No, go back</a>
+            <button type="submit" class="regular-btn bg-red mg-left">Yes, I'm</button>
         </div>
     </form>
 </div>
